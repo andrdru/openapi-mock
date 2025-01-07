@@ -1,0 +1,139 @@
+openapi: 3.0.3
+info:
+  title: My API
+  description: |-
+    Here is openapi file
+  version: 1.0.0
+servers:
+  - url: https://domain.tld/api/v1
+tags:
+  - name: system
+    description: Системные
+  - name: user
+    description: Пользователи
+
+paths:
+
+  /status:
+    get:
+      tags:
+        - system
+      summary: Пример пустого объекта в ответе
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empty'
+
+  /users/profile2:
+    get:
+      tags:
+        - user
+      summary: Пример метода, который уже имплементирован
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/profile:
+    get:
+      tags:
+        - user
+      summary: Получить мой профиль
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+    put:
+      tags:
+        - user
+      summary: Редактировать мой профиль
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      tags:
+        - user
+      summary: Профиль другого пользователя
+      parameters:
+        - name: id
+          in: path
+          description: id пользователя
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: Uasya
+        friends:
+          $ref: '#/components/schemas/UserList'
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-10-17T13:14:15+03:00"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2024-06-17T13:14:15+03:00"
+        deleted_at:
+          type: string
+          format: date-time
+          example: "2024-06-17T13:14:15+03:00"
+    UserList:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          format: int64
+          example: 10
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    Empty:
+      type: object
