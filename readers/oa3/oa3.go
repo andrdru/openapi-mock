@@ -16,7 +16,7 @@ import (
 
 type Reader struct {
 	oa3t   *openapi3.T
-	prefix string
+	prefix *string
 
 	maxDepth              int64
 	contentType           string
@@ -51,15 +51,19 @@ func NewReader(r io.Reader, options ...Option) (*Reader, error) {
 		return nil, fmt.Errorf("loading swagger json failed: %w", err)
 	}
 
-	if len(ret.oa3t.Servers) > 0 {
-		var serverUrl *url.URL
+	if ret.prefix == nil {
+		ret.prefix = new(string)
 
-		serverUrl, err = url.Parse(ret.oa3t.Servers[0].URL)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse server url: %w", err)
+		if len(ret.oa3t.Servers) > 0 {
+			var serverUrl *url.URL
+
+			serverUrl, err = url.Parse(ret.oa3t.Servers[0].URL)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse server url: %w", err)
+			}
+
+			ret.prefix = &serverUrl.Path
 		}
-
-		ret.prefix = serverUrl.Path
 	}
 
 	return ret, nil
@@ -81,6 +85,7 @@ func (r *Reader) setOptions(options ...Option) {
 	r.maxDepth = args.maxDepth
 	r.contentType = args.contentType
 	r.arrayItemsDisplay = args.arrayItemsDisplay
+	r.prefix = args.customPrefix
 
 	if args.randomFillNonRequired != nil {
 		r.randomFillNonRequired = true
@@ -111,7 +116,7 @@ func (r *Reader) getOperations() map[string]*openapi3.Operation {
 		operations := item.Operations()
 
 		for httpMethod := range operations {
-			ret[fmt.Sprintf("%s %s", httpMethod, path.Join(r.prefix, itemPath))] = operations[httpMethod]
+			ret[fmt.Sprintf("%s %s", httpMethod, path.Join(*r.prefix, itemPath))] = operations[httpMethod]
 		}
 	}
 

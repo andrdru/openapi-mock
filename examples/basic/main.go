@@ -30,6 +30,7 @@ func main() {
 		oa3.ContentType("application/json"),
 		oa3.RandomFillNonRequired(true),
 		oa3.ArrayItemsDisplay(3),
+		oa3.CustomPrefix("/api/v1"),
 	)
 	if err != nil {
 		log.Error("loading swagger json failed", "error", err.Error())
