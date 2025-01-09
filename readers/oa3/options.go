@@ -6,6 +6,7 @@ type (
 		contentType           string
 		arrayItemsDisplay     int64
 		randomFillNonRequired *struct{}
+		customPrefix          *string
 	}
 
 	Option func(*Options)
@@ -37,5 +38,11 @@ func RandomFillNonRequired(randomFillNonRequired bool) Option {
 		}
 
 		args.randomFillNonRequired = nil
+	}
+}
+
+func CustomPrefix(prefix string) Option {
+	return func(args *Options) {
+		args.customPrefix = &prefix
 	}
 }
