@@ -16,7 +16,16 @@ func main() {
 
 	log.Info("server starting")
 
-	swaggerReader, err := oa3.NewReader("swagger.yaml",
+	fileReader, err := os.Open("swagger.yaml")
+	if err != nil {
+		log.Error("open file failed", "error", err.Error())
+		os.Exit(1)
+	}
+	defer func() {
+		_ = fileReader.Close()
+	}()
+
+	swaggerReader, err := oa3.NewReader(fileReader,
 		oa3.MaxDepth(3),
 		oa3.ContentType("application/json"),
 		oa3.RandomFillNonRequired(true),

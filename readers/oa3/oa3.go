@@ -3,6 +3,7 @@ package oa3
 import (
 	"errors"
 	"fmt"
+	"io"
 	"math/rand/v2"
 	"net/url"
 	"path"
@@ -37,7 +38,7 @@ var (
 	randomFillNonRequired = new(struct{})
 )
 
-func NewReader(filePath string, options ...Option) (*Reader, error) {
+func NewReader(r io.Reader, options ...Option) (*Reader, error) {
 	var (
 		err error
 		ret = &Reader{}
@@ -45,7 +46,7 @@ func NewReader(filePath string, options ...Option) (*Reader, error) {
 
 	ret.setOptions(options...)
 
-	ret.oa3t, err = openapi3.NewLoader().LoadFromFile(filePath)
+	ret.oa3t, err = openapi3.NewLoader().LoadFromIoReader(r)
 	if err != nil {
 		return nil, fmt.Errorf("loading swagger json failed: %w", err)
 	}
